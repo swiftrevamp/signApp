@@ -1,0 +1,197 @@
+# services:
+#   server:
+#     image: opensign/opensignserver:main
+#     container_name: OpenSignServer-container
+#     volumes:
+#       - opensign-files:/usr/src/app/files
+#     ports:
+#       - "8080:8080"
+#     depends_on:
+#       - mongo
+#     env_file: .env.prod
+#     environment:
+#       - NODE_ENV=production
+#       - SERVER_URL=${HOST_URL:-https://localhost:3001}/api/app
+#       - PUBLIC_URL=${HOST_URL:-https://localhost:3001}
+#     networks:
+#       - app-network
+#   mongo:
+#     image: mongo:latest
+#     container_name: mongo-container
+#     volumes:
+#       - data-volume:/data/db
+#     ports:
+#       - "27018:27017"
+#     networks:
+#       - app-network
+#   client:
+#     image: opensign/opensign:main
+#     container_name: OpenSign-container
+#     depends_on:
+#       - server
+#     env_file: .env.prod  
+#     ports:
+#       - "3000:3000"
+#     networks:
+#       - app-network
+#   caddy:
+#     image: caddy:latest
+#     container_name: caddy-container
+#     ports:
+#       - "3001:3001"
+#       - "80:80"
+#       - "443:443"
+#       - "443:443/udp"
+#     volumes:
+#       - ./Caddyfile:/etc/caddy/Caddyfile
+#       - caddy_data:/data
+#       - caddy_config:/config
+#     networks:
+#       - app-network
+#     environment:
+#       - HOST_URL=${HOST_URL:-localhost:3001}
+# networks:
+#   app-network:
+#     driver: bridge
+
+# volumes:
+#   data-volume:
+#   web-root:
+#   caddy_data:
+#   caddy_config:
+#   opensign-files:
+
+
+
+# services:
+#   server:
+#     # image: opensign/opensignserver:main  <-- Ise comment karein
+#     build: 
+#       context: .
+#       dockerfile: ./apps/server/Dockerfile # Agar monorepo hai toh path check karein
+#     container_name: OpenSignServer-container
+#     volumes:
+#       - ./apps/server:/usr/src/app         # Isse local code changes dikhenge
+#       - opensign-files:/usr/src/app/files
+#     ports:
+#       - "8080:8080"
+#     depends_on:
+#       - mongo
+#     env_file: .env # Humne ise .env kar diya jo asaan hai
+#     environment:
+#       - NODE_ENV=development # Production se development kar dein
+#       - SERVER_URL=http://localhost:8080/app
+#       - PUBLIC_URL=http://localhost:3001
+#     networks:
+#       - app-network
+
+#   mongo:
+#     image: mongo:latest
+#     container_name: mongo-container
+#     volumes:
+#       - data-volume:/data/db
+#     ports:
+#       - "27017:27017" # Localhost se connect karne ke liye 27017 rakhein
+#     networks:
+#       - app-network
+
+#   client:
+#     # image: opensign/opensign:main <-- Ise comment karein
+#     build:
+#       context: .
+#       dockerfile: ./apps/web/Dockerfile # Frontend ka path
+#     container_name: OpenSign-container
+#     depends_on:
+#       - server
+#     volumes:
+#       - ./apps/web:/usr/src/app # Isse UI changes live dikhenge
+#     env_file: .env  
+#     ports:
+#       - "3000:3000"
+#     networks:
+#       - app-network
+
+
+#-----------------------------------5---------------------------
+services:
+  # server:
+  #   build: 
+  #     context: .  # Build ab main folder se shuru hoga
+  #     dockerfile: ./apps/OpenSignServer/Dockerhubfile
+  #   container_name: OpenSignServer-container
+  #   volumes:
+  #     - ./apps/OpenSignServer:/usr/src/app
+  #     - /usr/src/app/node_modules
+  #     - opensign-files:/usr/src/app/files
+  #   ports:
+  #     - "8080:8080"
+  #   depends_on:
+  #     - mongo
+  #   env_file: .env
+  #   environment:
+  #     - NODE_ENV=development
+  #        - CHOKIDAR_USEPOLLING=true
+  #     - WATCHPACK_POLLING=true
+  #   networks:
+  #     - app-network
+  server:
+    build: 
+      context: .  
+      dockerfile: ./apps/OpenSignServer/Dockerhubfile
+    container_name: OpenSignServer-container
+    volumes:
+      - ./apps/OpenSignServer:/usr/src/app
+      - /usr/src/app/node_modules
+      # --- YE BADLAV KIYA HAI ---
+      # Ab files seedha aapke folder mein save hongi
+      - ./apps/OpenSignServer/files:/usr/src/app/files
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mongo
+    env_file: .env
+    environment:
+      - NODE_ENV=development
+      - CHOKIDAR_USEPOLLING=true
+      - WATCHPACK_POLLING=true
+    networks:
+      - app-network
+
+  mongo:
+    image: mongo:latest
+    container_name: mongo-container
+    volumes:
+      - data-volume:/data/db
+    ports:
+      - "27017:27017"
+    networks:
+      - app-network
+
+  client:
+  
+    build: 
+      context: .  # Build ab main folder se shuru hoga
+      dockerfile: ./apps/OpenSign/Dockerhubfile
+    container_name: OpenSign-container
+    depends_on:
+      - server
+    volumes:
+      - ./apps/OpenSign:/usr/src/app
+      - /usr/src/app/node_modules
+      - /usr/src/app/.next
+    env_file: .env  
+    ports:
+      - "3000:3000"
+    networks:
+      - app-network
+    # --- YE DO LINES CRASH ROK DENGI ---
+    entrypoint: ["npm", "run", "dev","--", "--host"] 
+    command: [] 
+    # ----------------------------------
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  data-volume:
+  # opensign-files:
