@@ -59,7 +59,8 @@ export default function Title() {
   const { t } = useTranslation();
   const appName =
     "OpenSign™";
-  const logo = useMemo(() => localStorage.getItem("favicon"), []);
+  // const logo = useMemo(() => localStorage.getItem("favicon"), []);
+  const logo = "/favicon.png"; 
   const prefix = useMemo(
     () => resolveTitle(pathname, state?.title),
     [pathname, state?.title]

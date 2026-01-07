@@ -132,6 +132,7 @@ const Header = ({ isConsole, setIsLoggingOut }) => {
   return (
     <>
       <div className="op-navbar bg-base-100 shadow touch-none">
+    
         <div className="flex-none">
           <button
             className="op-btn op-btn-square op-btn-ghost focus:outline-none hover:bg-transparent op-btn-sm no-animation"
@@ -140,6 +141,7 @@ const Header = ({ isConsole, setIsLoggingOut }) => {
             <i className="fa-light fa-bars text-xl text-base-content"></i>
           </button>
         </div>
+       
         <div className="flex-1 ml-2">
           <div
             onClick={() => navigate("/dashboard/35KBoSgoAK")}
@@ -149,9 +151,9 @@ const Header = ({ isConsole, setIsLoggingOut }) => {
               <img
                 className="object-contain h-full w-auto"
                 src={
-                      isDarkTheme
-                      ? "/static/js/assets/images/logo-dark.png"
-                      : applogo
+                      // isDarkTheme
+                      // ? "/static/js/assets/images/logo.png"
+                       applogo
                 }
                 alt="logo"
               />
