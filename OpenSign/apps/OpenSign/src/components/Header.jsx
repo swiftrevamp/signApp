@@ -248,14 +248,14 @@ const Header = ({ isConsole, setIsLoggingOut }) => {
                     </span>
                   </li>
                   <li>
-                    <span>
+                    {/* <span>
                       <i className="fa-light fa-moon"></i>
                       {t("dark-mode")}
                       <span className="text-[10px] font-semibold bg-base-300 text-base-content px-1 rounded-md">
                         BETA
                       </span>
                       <ThemeToggle />
-                    </span>
+                    </span> */}
                   </li>
                 </>
               )}

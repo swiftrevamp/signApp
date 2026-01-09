@@ -3476,8 +3476,8 @@ export const flattenPdf = async (pdfFile) => {
 };
 
 export const mailTemplate = (param) => {
-  const appName = "OpenSign™";
-  const logo = `<div style='padding:10px'><img src='https://qikinnovation.ams3.digitaloceanspaces.com/logo.png' height='50' /></div>`;
+  const appName = "UniSign";
+  const logo = `<div style='padding:10px'><img src='https://unidesign-jewel.com/images/logo.png' height='50' /></div>`;
 
   const opurl = ` <a href='https://www.opensignlabs.com' target=_blank>here</a>.</p></div></div></body></html>`;
   const subject = `${param.senderName} has requested you to sign "${param.title}"`;

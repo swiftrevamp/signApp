@@ -253,7 +253,7 @@ export const mailTemplate = param => {
   const themeColor = '#47a3ad';
   const subject = `${param.senderName} has requested you to sign "${param.title}"`;
   const AppName = appName;
-  const logo = `<img src='https://qikinnovation.ams3.digitaloceanspaces.com/logo.png' height='50' />`;
+  const logo = `<img src='https://unidesign-jewel.com/images/logo.png' height='50' />`;
 
   const opurl = ` <a href='www.opensignlabs.com' target=_blank>here</a>`;
 

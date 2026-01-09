@@ -13,6 +13,7 @@ export default async function GenerateCertificate(docDetails) {
   pdfDoc.registerFontkit(fontkit);
   const timesRomanFont = await pdfDoc.embedFont(fontBytes, { subset: true });
   const pngUrl = fs.readFileSync('./logo.png').buffer;
+  {console.log(pngUrl,"pngUrl")}
   const pngImage = await pdfDoc.embedPng(pngUrl);
   const page = pdfDoc.addPage();
   const { width, height } = page.getSize();
@@ -80,6 +81,7 @@ export default async function GenerateCertificate(docDetails) {
     borderColor: borderColor,
     borderWidth: 1,
   });
+  
   page.drawImage(pngImage, {
     x: 30,
     y: 790,
@@ -95,7 +97,7 @@ export default async function GenerateCertificate(docDetails) {
     color: rgb(0.12, 0.12, 0.12),
   });
 
-  page.drawText('Certificate of Completion', {
+  page.drawText('Certificate of Completion ', {
     x: 160,
     y: 755,
     size: title,
