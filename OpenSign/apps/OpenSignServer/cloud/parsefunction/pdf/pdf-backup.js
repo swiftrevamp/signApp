@@ -160,6 +160,10 @@ async function sendNotifyMail(doc, signUser, mailProvider, publicUrl) {
   }
 }
 
+
+
+
+
 async function sendCompletedMail(obj) {
   const url = obj.doc?.SignedUrl;
   const doc = obj.doc;
@@ -179,7 +183,9 @@ async function sendCompletedMail(obj) {
     `</div></div><div><p>This is an automated email from ${TenantAppName}. For any queries regarding this email, please contact the sender ${sender.Email} directly.` +
     `If you think this email is inappropriate or spam, you may file a complaint with ${TenantAppName}${opurl}.</p></div></div></body></html>`;
 
+  // Custom mail logic (ise waise hi rehne dein)
   if (obj?.isCustomMail) {
+    // ... (YEH POORA SECTION JAISA THA WAISA HI RAHEGA, KOI BADLAV NAHI)
     const tenant = sender?.TenantId;
     if (tenant) {
       subject = tenant?.CompletionSubject ? tenant?.CompletionSubject : subject;
@@ -241,36 +247,38 @@ async function sendCompletedMail(obj) {
     isSigned: true,
   });
 
-  // UPDATED: Removed certificatePath from params because it's merged now
+  // Sirf OWNER ko email bhejo ATTACHMENTS KE SAATH
   const ownerParams = {
     extUserId: sender.objectId,
     url: url,
     from: TenantAppName,
     replyto: doc?.ExtUserPtr?.Email || '',
-    recipient: sender.Email, 
+    recipient: sender.Email, // Sirf owner ka email
     subject: subject,
     pdfName: pdfName,
     html: body,
     mailProvider: obj.mailProvider,
     bcc: updatedBcc?.length > 0 ? updatedBcc : '',
-    // certificatePath: `./exports/signed_certificate_${doc.objectId}.pdf`, // Removed separate attachment
-    filename: docName, // This is the merged PDF
+    certificatePath: `./exports/signed_certificate_${doc.objectId}.pdf`, // Attachment 1
+    filename: docName, // Attachment 2
   };
   
   try {
     const res = await axios.post(serverUrl + '/functions/sendmailv3', ownerParams, { headers });
-    // Cleanup handled in sendMailsaveCertifcate or caller
+    if (res.data?.result?.status !== 'success') {
+      // Agar mail fail ho, toh certificate file delete kar do
+      unlinkFile(`./exports/signed_certificate_${doc.objectId}.pdf`);
+    }
   } catch (err) {
-    console.log("Error sending completion mail", err);
+    unlinkFile(`./exports/signed_certificate_${doc.objectId}.pdf`);
   }
+
+  // SIGNERS KO MAIL BHEJNE WALA POORA CODE HATA DIYA GAYA HAI
 }
 //----------------
 
 // `sendMailsaveCertifcate` is used send completion mail and update complete status of document
 async function sendMailsaveCertifcate(doc, pfx, isCustomMail, mailProvider, filename) {
-  // Note: We still generate and save the certificate as a separate file for the DB record (CertificateUrl),
-  // but we don't attach it to the email anymore since it's merged in the main doc.
-  
   const certificate = await GenerateCertificate(doc);
   const certificatePdf = await PDFDocument.load(certificate);
   const P12Buffer = fs.readFileSync(pfx.name);
@@ -297,32 +305,42 @@ async function sendMailsaveCertifcate(doc, pfx, isCustomMail, mailProvider, file
   const file = await uploadFile('certificate.pdf', certificatePath);
   const body = { CertificateUrl: file.imageUrl };
   await axios.put(`${docUrl}/${doc.objectId}`, body, { headers });
-  
   // used in API only
   if (doc.IsSendMail === false) {
     console.log("don't send mail");
   } else {
-    // Send email (Logic inside modified to send only merged doc)
-    await sendCompletedMail({ isCustomMail, doc, mailProvider, filename });
+    sendCompletedMail({ isCustomMail, doc, mailProvider, filename });
   }
-  
   saveFileUsage(CertificateBuffer.length, file.imageUrl, doc?.CreatedBy?.objectId);
   unlinkFile(pfx.name);
-  unlinkFile(certificatePath); // Cleanup the separate certificate file
   return file.imageUrl;
 }
 
 
+//----------------sendMailsaveCertifcate---------------start-------------------
+
 //----------------sendMailsaveCertifcate---------------end-------------------
-// ... baaki imports wese hi rahenge
-
-// ... baaki helper functions (uploadFile, updateDoc, etc.) wese hi rahenge
-
+/**
+ * Process a PDF for signing:
+ * - updates audit trail, generates certificate.
+ * - Optionally inserts a signature placeholder (Placeholder()).
+ * - Otherwise (no merge + no placeholder), it flattens forms for finalization.
+ *
+ * @param {Object} _resDoc - Document details (expects AuditTrail, etc.)
+ * @param {Buffer|Uint8Array} pdfBytes - Original PDF bytes
+ * @param {string} [options.reason] - Reason text used in placeholder
+ * @param {string} [options.UserPtr] -  user pointer (for audit trail)
+ * @param {string} [options.ipAddress] - IP (for audit trail)
+ * @param {string} [options.Signature] - Signature (for audit trail)
+ * @returns {Promise<Buffer>} merged PDF Buffer
+ */
 async function processPdf(_resDoc, PdfBuffer, reason) {
   // No CC merge; operate directly on the original PDF
   const pdfDoc = await PDFDocument.load(PdfBuffer);
   const form = pdfDoc.getForm();
+  // Updates the field appearances to ensure visual changes are reflected.
   form.updateFieldAppearances();
+  // Flattens the form, converting all form fields into non-editable, static content
   form.flatten();
   Placeholder({
     pdfDoc: pdfDoc,
@@ -335,39 +353,44 @@ async function processPdf(_resDoc, PdfBuffer, reason) {
   const pdfWithPlaceholderBytes = await pdfDoc.save();
   return Buffer.from(pdfWithPlaceholderBytes);
 }
-
+/**
+ *
+ * @param docId Id of Document in which user is signing
+ * @param pdfFile base64 of pdfFile which you want sign
+ * @returns if success {status, data} else {status, message}
+ */
 async function PDF(req) {
   const docId = req.params.docId;
   const randomNumber = Math.floor(Math.random() * 5000);
   const pfxname = `keystore_${randomNumber}.pfx`;
   try {
-    const userIP = req.headers['x-real-ip']; 
+    const userIP = req.headers['x-real-ip']; // client IPaddress
     const reqUserId = req.params.userId;
     const isCustomMail = req.params.isCustomCompletionMail || false;
     const mailProvider = req.params.mailProvider || '';
     const sign = req.params.signature || '';
     const publicUrl = req.headers.public_url;
-
+    // below bode is used to get info of docId
     const docQuery = new Parse.Query('contracts_Document');
     docQuery.include('ExtUserPtr,Signers,ExtUserPtr.TenantId,Bcc,CreatedBy');
     docQuery.equalTo('objectId', docId);
     const resDoc = await docQuery.first({ useMasterKey: true });
-    
     if (!resDoc) {
       throw new Parse.Error(Parse.Error.OBJECT_NOT_FOUND, 'Document not found.');
     }
-    
     const IsEnableOTP = resDoc?.get('IsEnableOTP') || false;
+    // if `IsEnableOTP` is false then we don't have to check authentication
     if (IsEnableOTP) {
       if (!req?.user) {
         throw new Parse.Error(Parse.Error.INVALID_SESSION_TOKEN, 'User is not authenticated.');
       }
     }
-    
     const _resDoc = resDoc?.toJSON();
     let signUser;
     let className;
+    // `reqUserId` is send throught pdfrequest signing flow
     if (reqUserId) {
+      // to get contracts_Contactbook details for currentuser from reqUserId
       const _contractUser = _resDoc.Signers.find(x => x.objectId === reqUserId);
       if (_contractUser) {
         signUser = _contractUser;
@@ -380,9 +403,10 @@ async function PDF(req) {
 
     const username = signUser.Name;
     const userEmail = signUser.Email;
-    
     if (req.params.pdfFile) {
+      //  `PdfBuffer` used to create buffer from pdf file
       let PdfBuffer = Buffer.from(req.params.pdfFile, 'base64');
+      //  `P12Buffer` used to create buffer from p12 certificate
       let pfxFile = process.env.PFX_BASE64;
       let passphrase = process.env.PASS_PHRASE;
       if (_resDoc?.ExtUserPtr?.TenantId?.PfxFile?.base64) {
@@ -393,18 +417,10 @@ async function PDF(req) {
       const P12Buffer = Buffer.from(pfxFile, 'base64');
       fs.writeFileSync(pfxname, P12Buffer);
       const UserPtr = { __type: 'Pointer', className: className, objectId: signUser.objectId };
-      const obj = { UserPtr: UserPtr, SignedUrl: '', Activity: 'Signed', ipAddress: userIP, SignedOn: new Date(), Signature: sign };
-      
+      const obj = { UserPtr: UserPtr, SignedUrl: '', Activity: 'Signed', ipAddress: userIP };
       let updateAuditTrail;
       if (_resDoc.AuditTrail && _resDoc.AuditTrail.length > 0) {
-        const AuditTrail = JSON.parse(JSON.stringify(_resDoc.AuditTrail));
-        const existingIndex = AuditTrail.findIndex(
-            entry => entry.UserPtr.objectId === signUser.objectId && entry.Activity !== 'Created'
-        );
-        existingIndex !== -1
-            ? (AuditTrail[existingIndex] = { ...AuditTrail[existingIndex], ...obj })
-            : AuditTrail.push(obj);
-        updateAuditTrail = AuditTrail;
+        updateAuditTrail = [..._resDoc.AuditTrail, obj];
       } else {
         updateAuditTrail = [obj];
       }
@@ -416,75 +432,59 @@ async function PDF(req) {
           _resDoc?.Placeholders?.length > 0 &&
           _resDoc?.Placeholders?.filter(x => x?.Role !== 'prefill');
         if (auditTrail.length === removePrefill?.length) {
+          // if (auditTrail.length === _resDoc.Signers.length) {
           isCompleted = true;
         }
       } else {
         isCompleted = true;
       }
-      
+      // below regex is used to replace all word with "_" except A to Z, a to z, numbers
       const docName = _resDoc?.Name?.replace(/[^a-zA-Z0-9._-]/g, '_')?.toLowerCase();
       const filename = docName?.length > 100 ? docName?.slice(0, 100) : docName;
       const name = `${filename}_${randomNumber}.pdf`;
+      let filePath = `./exports/${name}`;
       let signedFilePath = `./exports/signed_${name}`;
       let pdfSize = PdfBuffer.length;
       let documentHash;
-
       if (isCompleted) {
-        // --- CORRECTED SEQUENCE START ---
-        
-        // 1. Generate Certificate FIRST
-        const docForCert = { ..._resDoc, AuditTrail: updateAuditTrail };
-        const certBytes = await GenerateCertificate(docForCert);
-
-        // 2. Merge Certificate into Main PDF (Before adding placeholder)
-        const mainPdfDoc = await PDFDocument.load(PdfBuffer);
-        const certPdfDoc = await PDFDocument.load(certBytes);
-        
-        const certPages = await mainPdfDoc.copyPages(certPdfDoc, certPdfDoc.getPageIndices());
-        certPages.forEach((page) => mainPdfDoc.addPage(page));
-        
-        // Save the merged PDF. This is now our base PDF for signing.
-        const mergedPdfBytes = await mainPdfDoc.save(); 
-        let finalPdfBuffer = Buffer.from(mergedPdfBytes);
-
-        // 3. NOW Add Placeholder and Flatten (On the merged PDF)
         const signersName = _resDoc.Signers?.map(x => x.Name + ' <' + x.Email + '>');
         const reason =
           signersName && signersName.length > 0
             ? signersName?.join(', ')
             : username + ' <' + userEmail + '>';
-            
-        // processPdf will add the 'ByteRange' placeholder needed for signing
-        finalPdfBuffer = await processPdf(_resDoc, finalPdfBuffer, reason);
-
-        // 4. Digitally Sign
         const p12Cert = new P12Signer(P12Buffer, { passphrase: passphrase || null });
+        signedFilePath = `./exports/signed_${name}`;
+        PdfBuffer = await processPdf(_resDoc, PdfBuffer, reason, UserPtr, userIP, sign);
+        //`new signPDF` create new instance of pdfBuffer and p12Buffer
         const OBJ = new SignPdf();
-        const signedDocs = await OBJ.sign(finalPdfBuffer, p12Cert);
+        // `signedDocs` is used to signpdf digitally
+        const signedDocs = await OBJ.sign(PdfBuffer, p12Cert);
 
-        // --- CORRECTED SEQUENCE END ---
-
+        //`saveUrl` is used to save signed pdf in exports folder
         fs.writeFileSync(signedFilePath, signedDocs);
         pdfSize = signedDocs.length;
         documentHash = generateDocumentHash(signedDocs);
-        console.log(`✅ PDF digitally signed and merged created: ${signedFilePath} \n`);
+        console.log(`✅ PDF digitally signed created: ${signedFilePath} \n`);
       } else {
+        //`saveUrl` is used to save signed pdf in exports folder
         fs.writeFileSync(signedFilePath, PdfBuffer);
         pdfSize = PdfBuffer.length;
         console.log(`New Signed PDF created called: ${signedFilePath}`);
       }
 
+      // `uploadFile` is used to upload pdf to aws s3 and get it's url
       const data = await uploadFile(`signed_${name}`, signedFilePath);
 
       if (data && data.imageUrl) {
+        // `axios` is used to update signed pdf url in contracts_Document classes for given DocId
         const updatedDoc = await updateDoc(
-          req.params.docId,
-          data.imageUrl,
-          signUser.objectId,
-          userIP,
-          _resDoc,
-          className,
-          sign,
+          req.params.docId, //docId
+          data.imageUrl, // SignedUrl
+          signUser.objectId, // userID
+          userIP, // client ipAddress,
+          _resDoc, // auditTrail, signers, etc data
+          className, // className based on flow
+          sign, // sign base64
           isCompleted ? documentHash : undefined
         );
         sendNotifyMail(_resDoc, signUser, mailProvider, publicUrl);
@@ -495,22 +495,24 @@ async function PDF(req) {
           if (hashForDoc) {
             doc.DocumentHash = hashForDoc;
           }
-          await sendMailsaveCertifcate(doc, pfx, isCustomMail, mailProvider, `signed_${name}`);
+          sendMailsaveCertifcate(doc, pfx, isCustomMail, mailProvider, `signed_${name}`);
         } else {
           unlinkFile(pfxname);
         }
+        // below code is used to remove exported signed pdf file from exports folder
         unlinkFile(signedFilePath);
+        // console.log(`New Signed PDF created called: ${filePath}`);
         if (updatedDoc.message === 'success') {
           return { status: 'success', data: data.imageUrl };
         } else {
           const error = new Error('Please provide required parameters!');
-          error.code = 400; 
+          error.code = 400; // Set the error code (e.g., 400 for bad request)
           throw error;
         }
       }
     } else {
       const error = new Error('Pdf file not present!');
-      error.code = 400; 
+      error.code = 400; // Set the error code (e.g., 400 for bad request)
       throw error;
     }
   } catch (err) {
