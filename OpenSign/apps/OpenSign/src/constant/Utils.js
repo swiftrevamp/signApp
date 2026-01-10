@@ -457,6 +457,97 @@ export const getSignerPages = (xyPosition = [], currentKey, signerId) => {
   return xyPosition;
 };
 
+// export const addWidgetOptions = (
+//   type,
+//   signer,
+//   placeholder,
+//   role,
+//   widgetValue
+// ) => {
+//   let defaultOpt;
+//   const id = generateId(6);
+//   if (placeholder) {
+//     const countSameWidget = placeholder?.reduce((count, page) => {
+//       return count + page.pos.filter((item) => item.type === type).length;
+//     }, 0);
+//     const count = countSameWidget + 1;
+//     defaultOpt = { name: `${type}-${id}-${count}`, status: "required" };
+//   } else {
+//     defaultOpt = { name: `${type}-${id}-1`, status: "required" };
+//   }
+//   switch (type) {
+//     case "signature":
+//       return defaultOpt;
+//     case "stamp":
+//       return defaultOpt;
+//     case "checkbox":
+//       return { ...defaultOpt, isReadOnly: false, isHideLabel: false };
+//     case textInputWidget:
+//       return {
+//         ...defaultOpt,
+//         isReadOnly: false
+//       };
+//     case cellsWidget:
+//       return {
+//         ...defaultOpt,
+//         cellCount: 5,
+//         defaultValue: "",
+//         validation: { type: "", pattern: "" },
+//         isReadOnly: false
+//       };
+//     case "initials":
+//       return defaultOpt;
+//     case "name":
+//       return {
+//         ...defaultOpt,
+//         defaultValue: widgetValue ? widgetValue : ""
+//       };
+//     case "company":
+//       return {
+//         ...defaultOpt,
+//         defaultValue: widgetValue ? widgetValue : ""
+//       };
+//     case "job title":
+//       return {
+//         ...defaultOpt,
+//         defaultValue: widgetValue ? widgetValue : ""
+//       };
+//     case "date": {
+//       const dateFormat = signer?.DateFormat
+//         ? selectFormat(signer?.DateFormat)
+//         : "MM/dd/yyyy";
+//       return {
+//         ...defaultOpt,
+//         response: role === "prefill" ? getDate(signer?.DateFormat) : "",
+//         validation: { format: dateFormat, type: "date-format" }
+//       };
+//     }
+//     case "image":
+//       return defaultOpt;
+//     case "email":
+//       return {
+//         ...defaultOpt,
+//         validation: { type: "email", pattern: "" },
+//         defaultValue: widgetValue ? widgetValue : ""
+//       };
+//     case "dropdown":
+//       return defaultOpt;
+//     case radioButtonWidget:
+//       return {
+//         ...defaultOpt,
+//         values: [],
+//         isReadOnly: false
+//       };
+//     case textWidget:
+//       return defaultOpt;
+//     default:
+//       return {};
+//   }
+// };
+
+///----------------addWidgetOptions--------------------------------
+
+
 export const addWidgetOptions = (
   type,
   signer,
@@ -512,16 +603,23 @@ export const addWidgetOptions = (
         ...defaultOpt,
         defaultValue: widgetValue ? widgetValue : ""
       };
+
+    // --- YEH BADLAV YAHAN KIYA GAYA HAI ---
     case "date": {
       const dateFormat = signer?.DateFormat
         ? selectFormat(signer?.DateFormat)
         : "MM/dd/yyyy";
       return {
         ...defaultOpt,
-        response: role === "prefill" ? getDate(signer?.DateFormat) : "",
-        validation: { format: dateFormat, type: "date-format" }
+        // 'Signing Date' ke liye, response ko 'today' set karein
+        response: role === "prefill" ? getDate(signer?.DateFormat) : "today",
+        validation: { format: dateFormat, type: "date-format" },
+        // 'Read Only' ke liye, isReadOnly ko 'true' set karein
+        isReadOnly: true
       };
     }
+    // ------------------------------------
+
     case "image":
       return defaultOpt;
     case "email":
@@ -544,6 +642,87 @@ export const addWidgetOptions = (
       return {};
   }
 };
+//------------------------eAddWidget-----------------------
+
+// export const addWidgetSelfsignOptions = (
+//   type,
+//   getWidgetValue,
+//   owner,
+//   placeholder
+// ) => {
+//   let defaultOpt;
+//   //condition to handle widgets name field
+//   const id = generateId(6);
+//   if (placeholder) {
+//     const countSameWidget = placeholder?.reduce((count, page) => {
+//       return count + page.pos.filter((item) => item.type === type).length;
+//     }, 0);
+//     const count = countSameWidget + 1;
+//     defaultOpt = { name: `${type}-${id}-${count}`, status: "required" };
+//   } else {
+//     defaultOpt = { name: `${type}-${id}-1`, status: "required" };
+//   }
+//   switch (type) {
+//     case "signature":
+//       return defaultOpt;
+//     case "stamp":
+//       return defaultOpt;
+//     case "checkbox":
+//       return defaultOpt;
+//     case textWidget:
+//       return defaultOpt;
+//     case cellsWidget:
+//       return {
+//         ...defaultOpt,
+//         cellCount: 5,
+//         defaultValue: "",
+//         validation: { type: "", pattern: "" },
+//         isReadOnly: false
+//       };
+//     case "initials":
+//       return defaultOpt;
+//     case "name":
+//       return {
+//         ...defaultOpt,
+//         defaultValue: getWidgetValue(type),
+//         validation: { type: "text", pattern: "" }
+//       };
+//     case "company":
+//       return {
+//         ...defaultOpt,
+//         defaultValue: getWidgetValue(type),
+//         validation: { type: "text", pattern: "" }
+//       };
+//     case "job title":
+//       return {
+//         ...defaultOpt,
+//         defaultValue: getWidgetValue(type),
+//         validation: { type: "text", pattern: "" }
+//       };
+//     case "date": {
+//       const dateFormat = owner?.DateFormat
+//         ? selectFormat(owner?.DateFormat)
+//         : "MM/dd/yyyy";
+//       return {
+//         ...defaultOpt,
+//         response: getDate(owner?.DateFormat),
+//         validation: { format: dateFormat, type: "date-format" }
+//       };
+//     }
+//     case "image":
+//       return defaultOpt;
+//     case "email":
+//       return {
+//         ...defaultOpt,
+//         defaultValue: getWidgetValue(type),
+//         validation: { type: "email", pattern: "" }
+//       };
+//     default:
+//       return {};
+//   }
+// };
+
+//-----------------------addw----------------
 
 export const addWidgetSelfsignOptions = (
   type,
@@ -600,16 +779,23 @@ export const addWidgetSelfsignOptions = (
         defaultValue: getWidgetValue(type),
         validation: { type: "text", pattern: "" }
       };
+
+    // --- YEH BADLAV YAHAN KIYA GAYA HAI ---
     case "date": {
       const dateFormat = owner?.DateFormat
         ? selectFormat(owner?.DateFormat)
         : "MM/dd/yyyy";
       return {
         ...defaultOpt,
-        response: getDate(owner?.DateFormat),
-        validation: { format: dateFormat, type: "date-format" }
+        // 'Signing Date' ke liye, response ko 'today' set karein
+        response: "today",
+        validation: { format: dateFormat, type: "date-format" },
+        // 'Read Only' ke liye, isReadOnly ko 'true' set karein
+        isReadOnly: true
       };
     }
+    // ------------------------------------
+    
     case "image":
       return defaultOpt;
     case "email":
@@ -622,7 +808,7 @@ export const addWidgetSelfsignOptions = (
       return {};
   }
 };
-
+///-----------------------------add end----------------------
 export const defaultWidthHeight = (type) => {
   switch (type) {
     case "signature":

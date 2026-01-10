@@ -31,7 +31,7 @@ const DashboardButton = (props) => {
     >
       <div className="flex flex-row items-center text-base-content">
         <div className="flex flex-row items-center">
-          <span className="rounded-full bg-base-content bg-opacity-20 w-[60px] h-[60px] self-start flex justify-center items-center">
+          <span className="rounded-full bg-[oklch(0.83_0.08_265.01)]  bg-opacity-20 w-[60px] h-[60px] self-start flex justify-center items-center">
             <i
               className={`${
                 props.Icon ? props.Icon : "fa-light fa-info"

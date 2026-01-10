@@ -97,7 +97,7 @@ export default async function GenerateCertificate(docDetails) {
     color: rgb(0.12, 0.12, 0.12),
   });
 
-  page.drawText('Certificate of Completion ', {
+  page.drawText('Certificate of Completion Test', {
     x: 160,
     y: 755,
     size: title,

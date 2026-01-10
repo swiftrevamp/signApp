@@ -39,7 +39,7 @@ pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/l
 const AppLoader = () => {
   return (
     <div className="flex justify-center items-center h-[100vh]">
-      <h1>Hello</h1>
+      {/* <h1>Hello</h1> */}
       <Loader />
     </div>
   );
