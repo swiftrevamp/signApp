@@ -73,7 +73,7 @@ const sidebarList = [
   },
   {
     icon: "fa-light fa-folder",
-    title: "OpenSign™ Drive",
+    title: "UniSign Drive",
     target: "_self",
     pageType: "",
     description: "",

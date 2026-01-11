@@ -24,7 +24,7 @@ export const cellsWidget = "cells";
 export function getEnv() {
   return window?.RUNTIME_ENV || {};
 }
-const appName = "OpenSign™";
+const appName = "UniSign";
 
 export const defaultMailBody = `<p>Hi {{receiver_name}},</p><br><p>We hope this email finds you well. {{sender_name}}&nbsp;has requested you to review and sign&nbsp;{{document_title}}.</p><p>Your signature is crucial to proceed with the next steps as it signifies your agreement and authorization.</p><br><p><a href='{{signing_url}}' rel='noopener noreferrer' target='_blank'>Sign here</a></p><br><br><p>If you have any questions or need further clarification regarding the document or the signing process,  please contact the sender.</p><br><p>Thanks</p><p> Team ${appName}</p><br>`;
 export const defaultMailSubject = `{{sender_name}} has requested you to sign {{document_title}}`;
@@ -1521,7 +1521,7 @@ export const addInitialData = (signerPos, setXyPosition, value, userId) => {
 
 //function for embed document id
 export const embedDocId = async (pdfOriginalWH, pdfDoc, documentId) => {
-  const appName = "OpenSign™";
+  const appName = "UniSign";
   // `fontBytes` is used to embed custom font in pdf
   const fontBytes = await fileasbytes(
     "https://cdn.opensignlabs.com/webfonts/times.ttf"
@@ -2538,7 +2538,7 @@ export const embedWidgetsToDoc = async (
   } else {
     return {
       error:
-        "This pdf is not compatible with opensign please contact <support@opensignlabs.com>"
+        "This pdf is not compatible with Unidesign please contact <noreply@othersys.com>"
     };
   }
 };
@@ -2767,7 +2767,7 @@ export const getAppLogo = async () => {
       domain: domain
     });
     if (tenant) {
-      localStorage.setItem("appname", "OpenSign™");
+      localStorage.setItem("appname", "UniSign");
       localStorage.setItem("favicon", appInfo.fev_Icon);
       return {
         logo: tenant?.logo,
@@ -3035,7 +3035,7 @@ export const handleDownloadCertificate = async (
   setIsDownloading,
   isZip
 ) => {
-  const appName = "OpenSign™";
+  const appName = "UniSign";
   if (pdfDetails?.length > 0 && pdfDetails[0]?.CertificateUrl) {
     try {
       await fetch(pdfDetails[0] && pdfDetails[0]?.CertificateUrl);

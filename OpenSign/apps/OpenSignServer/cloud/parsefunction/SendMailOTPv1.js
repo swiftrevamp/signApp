@@ -22,7 +22,7 @@ async function sendMailOTPv1(request) {
     let code = Math.floor(1000 + Math.random() * 9000);
     let email = request.params.email;
     let TenantId = request.params.TenantId ? request.params.TenantId : undefined;
-    const AppName = 'Uni Sign';
+    const AppName = 'UniSign';
 
     if (email) {
       const recipient = request.params.email;

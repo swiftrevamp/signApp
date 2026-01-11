@@ -12,7 +12,7 @@ const MailTemplateEditor = ({
   info,
   tenantId,
 }) => {
-  const appName = localStorage.getItem("appname") || "OpenSign™";
+  const appName = localStorage.getItem("appname") || "UniSign";
   const { t } = useTranslation();
   const editorRef = useRef();
   const editorRefCom = useRef();

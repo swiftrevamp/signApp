@@ -46,7 +46,7 @@ const TemplatesReport = (props) => {
   const titleElement = useElSize(titleRef);
   const prefillImg = useSelector((state) => state.widget.prefillImg);
   const appName =
-    "OpenSign™";
+    "UniSign";
   const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
