@@ -84,14 +84,14 @@ const DocSuccessPage = () => {
                     ? t("document-has-been-signed")
                     : t("document-has-been-signed-by-you")}
                 </h1>
-                {pdfDetails?.[0]?.IsCompleted && (
+                {/* {pdfDetails?.[0]?.IsCompleted && (
                   <p className="text-sm md:text-base text-gray-600">
                     {t("participant-completed-signing")}
                   </p>
-                )}
+                )} */}
               </div>
               {/* Action Buttons */}
-              <div className="mt-6 flex flex-wrap justify-center gap-2">
+              {/* <div className="mt-6 flex flex-wrap justify-center gap-2">
                 <button
                   type="button"
                   className="font-medium text-sm md:text-[13px] md:px-4 py-2 op-btn op-btn-primary"
@@ -131,11 +131,11 @@ const DocSuccessPage = () => {
                   <i className="fa-light fa-print" aria-hidden="true"></i>
                   <span>{t("print")}</span>
                 </button>
-              </div>
+              </div> */}
               {/* Footer Message */}
-              <p className="mt-4 md:mt-6 text-xs md:text-sm text-gray-500">
+              {/* <p className="mt-4 md:mt-6 text-xs md:text-sm text-gray-500">
                 {t("you-will-receive-email-shortly")}
-              </p>
+              </p> */}
             </div>
           </div>
           {isDownloading === "pdf" && (
