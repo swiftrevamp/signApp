@@ -88,7 +88,7 @@ const DocSuccessPage = () => {
     }
   `}</style>
 
-  <div className="max-w-lg md:max-w-2xl w-full bg-white rounded-2xl shadow-xl p-6 md:p-12 transform transition-all duration-300">
+  <div className="max-w-lg md:max-w-2xl  bg-white rounded-2xl shadow-xl p-4 md:p-8 transform transition-all duration-300">
     
     <div className="flex flex-col items-center space-y-6">
       
@@ -107,7 +107,7 @@ const DocSuccessPage = () => {
 
       {/* Text Content */}
       <div className="space-y-3">
-        <h1 className="text-2xl md:text-3xl font-bold text-gray-800 tracking-tight">
+        <h1 className="text-lg md:text-lg font-bold text-gray-800 tracking-tight">
           {pdfDetails?.[0]?.IsCompleted
             ? t("document-has-been-signed")
             : t("document-has-been-signed-by-you")}
