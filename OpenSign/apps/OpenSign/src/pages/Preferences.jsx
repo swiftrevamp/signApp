@@ -20,7 +20,7 @@ import MailTemplateEditor from "../components/preferences/MailTemplateEditor";
 
 const Preferences = () => {
   const appName =
-    "OpenSign™";
+    "UniSign";
   const { t } = useTranslation();
   const [isalert, setIsAlert] = useState({ type: "success", msg: "" });
   const [isTopLoader, setIsTopLoader] = useState(false);
