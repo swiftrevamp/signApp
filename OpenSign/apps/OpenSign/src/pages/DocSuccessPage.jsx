@@ -75,69 +75,108 @@ const DocSuccessPage = () => {
         </div>
       ) : signed ? (
         <>
-          <div className="min-h-screen flex flex-col items-center justify-center p-3 md:p-8 text-center">
-            <div className="max-w-lg md:max-w-2xl bg-white rounded-lg shadow-lg p-3 md:p-10">
-              <div className="flex flex-col items-center space-y-4 ">
-                <CheckCircle className="text-green-500 w-12 h-12 md:w-14 md:h-14" />
-                <h1 className="text-xl md:text-2xl font-semibold text-gray-800">
-                  {pdfDetails?.[0]?.IsCompleted
-                    ? t("document-has-been-signed")
-                    : t("document-has-been-signed-by-you")}
-                </h1>
-                {/* {pdfDetails?.[0]?.IsCompleted && (
-                  <p className="text-sm md:text-base text-gray-600">
-                    {t("participant-completed-signing")}
-                  </p>
-                )} */}
-              </div>
-              {/* Action Buttons */}
-              {/* <div className="mt-6 flex flex-wrap justify-center gap-2">
-                <button
-                  type="button"
-                  className="font-medium text-sm md:text-[13px] md:px-4 py-2 op-btn op-btn-primary"
-                  onClick={() => handleDownload()}
-                >
-                  <i className="fa-light fa-download" aria-hidden="true"></i>
-                  <span>{t("download")}</span>
-                </button>
+<div className="min-h-screen flex flex-col items-center justify-center p-4 md:p-8 text-center bg-[rgb(14_47_109)]">
+  
+  {/* Custom CSS for Continuous Animation */}
+  <style>{`
+    @keyframes beat-fade {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.2); opacity: 0.9; }
+    }
+    .animate-icon-beat {
+      animation: beat-fade 1.5s infinite ease-in-out;
+    }
+  `}</style>
 
-                {
-                    pdfDetails?.[0]?.IsCompleted && (
-                      <button
-                        type="button"
-                        onClick={() =>
-                          handleDownloadCertificate(
-                            pdfDetails,
-                            setIsDownloading
-                          )
-                        }
-                        className="font-medium text-sm md:text-[13px] md:px-4 py-2 op-btn op-btn-secondary"
-                      >
-                        <i
-                          className="fa-light fa-award mx-[3px] md:mx-0"
-                          aria-hidden="true"
-                        ></i>
-                        <span>{t("certificate")}</span>
-                      </button>
-                    )
-                }
-                <button
-                  onClick={(e) =>
-                    handleToPrint(e, setIsDownloading, pdfDetails)
-                  }
-                  type="button"
-                  className="font-medium text-sm md:text-[13px] px-4 py-2 op-btn op-btn-neutral"
-                >
-                  <i className="fa-light fa-print" aria-hidden="true"></i>
-                  <span>{t("print")}</span>
-                </button>
-              </div> */}
-              {/* Footer Message */}
-              {/* <p className="mt-4 md:mt-6 text-xs md:text-sm text-gray-500">
-                {t("you-will-receive-email-shortly")}
-              </p> */}
+  <div className="max-w-lg md:max-w-2xl w-full bg-white rounded-2xl shadow-xl p-6 md:p-12 transform transition-all duration-300">
+    
+    <div className="flex flex-col items-center space-y-6">
+      
+      {/* Top Success Icon with Ping Effect */}
+      <div className="relative flex items-center justify-center">
+        <div className="absolute w-20 h-20 md:w-24 md:h-24 bg-green-100 rounded-full animate-ping opacity-75"></div>
+        {/* <div className="relative bg-green-50 rounded-full p-4 md:p-5">
+          <CheckCircle className="text-green-600 w-12 h-12 md:w-16 md:h-16" strokeWidth={2.5} />
+        </div> */}
+
+          <div className="flex items-center justify-center w-14 h-14 md:w-16 md:h-16 rounded-full border-[2px] border-green-500 bg-white shadow-lg">
+                {/* Added 'animate-icon-beat' class here */}
+                <i className="fa-solid fa-check text-green-500 text-xl md:text-3xl animate-icon-beat" aria-hidden="true"></i>
             </div>
-          </div>
+      </div>
+
+      {/* Text Content */}
+      <div className="space-y-3">
+        <h1 className="text-2xl md:text-3xl font-bold text-gray-800 tracking-tight">
+          {pdfDetails?.[0]?.IsCompleted
+            ? t("document-has-been-signed")
+            : t("document-has-been-signed-by-you")}
+        </h1>
+        
+        {/* Requested Icon with Continuous Animation */}
+        {/* <div className="mt-4 flex justify-center">
+            <div className="flex items-center justify-center w-14 h-14 md:w-16 md:h-16 rounded-full border-[2px] border-green-500 bg-[rgb(14,47,109)] shadow-lg">
+            
+                <i className="fa-solid fa-check text-green-500 text-xl md:text-3xl animate-icon-beat" aria-hidden="true"></i>
+            </div>
+        </div> */}
+      </div>
+
+      {/* {pdfDetails?.[0]?.IsCompleted && (
+        <p className="text-sm md:text-base text-gray-600">
+          {t("participant-completed-signing")}
+        </p>
+      )} */}
+    </div>
+
+    {/* Action Buttons */}
+    {/* <div className="mt-6 flex flex-wrap justify-center gap-2">
+      <button
+        type="button"
+        className="font-medium text-sm md:text-[13px] md:px-4 py-2 op-btn op-btn-primary"
+        onClick={() => handleDownload()}
+      >
+        <i className="fa-light fa-download" aria-hidden="true"></i>
+        <span>{t("download")}</span>
+      </button>
+
+      {
+          pdfDetails?.[0]?.IsCompleted && (
+            <button
+              type="button"
+              onClick={() =>
+                handleDownloadCertificate(
+                  pdfDetails,
+                  setIsDownloading
+                )
+              }
+              className="font-medium text-sm md:text-[13px] md:px-4 py-2 op-btn op-btn-secondary"
+            >
+              <i
+                className="fa-light fa-award mx-[3px] md:mx-0"
+                aria-hidden="true"
+              ></i>
+              <span>{t("certificate")}</span>
+            </button>
+          )
+      }
+      <button
+        onClick={(e) =>
+          handleToPrint(e, setIsDownloading, pdfDetails)
+        }
+        type="button"
+        className="font-medium text-sm md:text-[13px] px-4 py-2 op-btn op-btn-neutral"
+      >
+        <i className="fa-light fa-print" aria-hidden="true"></i>
+        <span>{t("print")}</span>
+      </button>
+    </div> */}
+    {/* Footer Message */}
+    {/* <p className="mt-4 md:mt-6 text-xs md:text-sm text-gray-500">
+      {t("you-will-receive-email-shortly")}
+    </p> */}
+  </div>
+</div>
           {isDownloading === "pdf" && (
             <div className="fixed z-[1000] inset-0 flex justify-center items-center bg-black bg-opacity-30">
               <Loader />
