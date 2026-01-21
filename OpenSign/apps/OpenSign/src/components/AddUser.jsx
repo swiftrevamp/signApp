@@ -67,71 +67,110 @@ const AddUser = (props) => {
     }
   };
   // Define a function to handle form submission
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    e.stopPropagation();
+ //=================================Add user With EMail Notification start===================
+
+
+
+
+
+const handleSubmit = async (e) => {
+    e.preventDefault(); // Default form submission ko roko
+    e.stopPropagation(); // Event propagation ko roko
+
+    console.log(formdata, "formdata");
+
     if (!emailRegex.test(formdata.email)) {
-      alert(t("valid-email-alert"));
+      alert(t("valid-email-alert")); // Valid email check
+      return; // Agar email invalid hai toh yahi se return ho jao
+    }
+
+    const localUser = JSON.parse(localStorage.getItem("Extand_Class"))?.[0];
+    setIsFormLoader(true); // Loader dikhao
+
+    const res = await checkUserExist(); // Check karo ki user pehle se exist karta hai ya nahi
+
+    if (res) {
+      // Agar user already exist karta hai
+      props.showAlert("danger", t("user-already-exist"));
+      setIsFormLoader(false); // Loader hatao
     } else {
-      const localUser = JSON.parse(localStorage.getItem("Extand_Class"))?.[0];
-      setIsFormLoader(true);
-      const res = await checkUserExist();
-      if (res) {
-        props.showAlert("danger", t("user-already-exist"));
-        setIsFormLoader(false);
-      } else {
-        if (localStorage.getItem("TenantId")) {
-          const timezone = usertimezone;
+      // Agar user exist nahi karta, toh naya user create karo
+      if (localStorage.getItem("TenantId")) {
+        const timezone = usertimezone;
+        try {
+          const params = {
+            name: formdata.name,
+            email: formdata.email,
+            phone: formdata.phone,
+            password: formdata.password, // Ye password adduser function ko jayega
+            role: formdata.role,
+            team: formdata.team,
+            timezone: timezone,
+            tenantId: localStorage.getItem("TenantId"),
+            organization: {
+              objectId: localUser?.OrganizationId?.objectId,
+              company: localUser?.Company
+            },
+          };
+
+          // Step 1: User ko Parse Server mein add karo
+          const addUserResponse = await Parse.Cloud.run("adduser", params);
+          const parseData = JSON.parse(JSON.stringify(addUserResponse));
+
+          // Step 2: User creation successful hone ke baad registration email bhejo
           try {
-            const params = {
-              name: formdata.name,
+            // sendRegistrationMail Cloud function ko call karo
+            await Parse.Cloud.run("sendRegistrationMail", {
               email: formdata.email,
-              phone: formdata.phone,
-              password: formdata.password,
-              role: formdata.role,
-              team: formdata.team,
-              timezone: timezone,
-              tenantId: localStorage.getItem("TenantId"),
-              organization: {
-                objectId: localUser?.OrganizationId?.objectId,
-                company: localUser?.Company
-              },
-            };
-            const res = await Parse.Cloud.run("adduser", params);
-            const parseData = JSON.parse(JSON.stringify(res));
-            if (props.closePopup) {
-              props.closePopup();
-            }
-            if (props.handleUserData) {
-              if (formdata?.team) {
-                const team = teamList.find((x) => x.objectId === formdata.team);
-                parseData.TeamIds = parseData.TeamIds.map((y) =>
-                  y.objectId === team.objectId ? team : y
-                );
-              }
-              props.handleUserData(parseData);
-            }
-            setIsFormLoader(false);
-            setFormdata({
-              name: "",
-              email: "",
-              phone: "",
-              team: "",
-              role: ""
+              password: formdata.password, 
+              name: formdata.name,
+       
+              TenantId: localStorage.getItem("TenantId") // Tenant ID agar zaroori hai
             });
-            props.showAlert("success", t("user-created-successfully"));
-          } catch (err) {
-            console.log("err", err);
-            setIsFormLoader(false);
-            props.showAlert("danger", t("something-went-wrong-mssg"));
+            console.log("Registration email successfully triggered from frontend.");
+            props.showAlert("success", t("registration-email-sent-successfully")); // User ko feedback de sakte hain
+          } catch (mailErr) {
+            console.error("Error triggering registration email from frontend:", mailErr);
+            props.showAlert("warning", t("user-created-but-email-failed-mssg")); // User ko batao ki email nahi ja paya
+            // Important: Email fail hone par user creation ko rollback mat karo, sirf log karo
           }
-        } else {
+
+          // Step 3: Baaki ke UI updates aur cleanup
+          if (props.closePopup) {
+            props.closePopup();
+          }
+          if (props.handleUserData) {
+            if (formdata?.team) {
+              const team = teamList.find((x) => x.objectId === formdata.team);
+              parseData.TeamIds = parseData.TeamIds.map((y) =>
+                y.objectId === team.objectId ? team : y
+              );
+            }
+            props.handleUserData(parseData);
+          }
+          setIsFormLoader(false); // Loader hatao
+          setFormdata({ // Form reset karo
+            name: "",
+            email: "",
+            phone: "",
+            team: "",
+            role: ""
+          });
+          props.showAlert("success", t("user-created-successfully")); // Final success message
+        } catch (err) {
+          // Add user ya kisi aur step mein error aaya
+          console.error("Error creating user or other issue:", err);
+          setIsFormLoader(false); // Loader hatao
           props.showAlert("danger", t("something-went-wrong-mssg"));
         }
+      } else {
+        // TenantId nahi mila
+        setIsFormLoader(false);
+        props.showAlert("danger", t("something-went-wrong-mssg"));
       }
     }
-  };
-
+};
+//=================================Add user With EMail Notification end===================
   // Define a function to handle the "add yourself" checkbox
   const handleReset = () => {
     setFormdata({ name: "", email: "", phone: "", team: "", role: "" });
