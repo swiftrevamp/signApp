@@ -243,7 +243,7 @@ const handleSubmit = async (e) => {
                           placeholder={t("enter-email")}
                         />
                       </div>
-                      <div className="mb-3">
+                      <div className="mb-3 hidden">
                         <label className="block text-xs font-semibold">
                           {t("password")}
                         </label>
