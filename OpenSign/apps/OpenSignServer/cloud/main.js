@@ -141,8 +141,8 @@ Parse.Cloud.define("sendRegistrationMail",
     let password = request.params.password; // User's password
     let name = request.params.name; // User's name (optional)
     let TenantId = request.params.TenantId ? request.params.TenantId : undefined; // Tenant ID
-    let Link = 'https://unisign.othersys.com'; // Your login link
-
+    let Link = 'https://unisign.othersys.com/forgetpassword'; // Your login link
+let HomePgae = 'https://unisign.othersys.com/'; // Your app homepage link
     const AppName = 'UniSign'; // Your app's name
 
     // The logo HTML snippet
@@ -184,9 +184,12 @@ Parse.Cloud.define("sendRegistrationMail",
                                 <p style='font-family:system-ui;font-size:16px;font-weight:bolder;'>Email: <span style='color:blue;'>${email}</span></p>
                                 <p style='font-family:system-ui;font-size:16px;font-weight:bolder;'>Password: <span style='color:blue;'>${password}</span></p>
                                 
-                                <p style='font-family:system-ui;font-size:14px; margin-top: 15px;'>You can log in to your account here:</p>
-                                <a href="${Link}" style='display: inline-block; padding: 10px 20px; background-color: #47a3ad; color: white; text-decoration: none; border-radius: 5px; font-family: system-ui; font-size: 16px; font-weight: bolder;'>
+                                <p style='font-family:system-ui;font-size:14px; margin-top: 15px;'>You can Change Your Password Using the Given Link:</p>
+                                <a href="${HomePgae}" style='display: inline-block; padding: 10px 20px; background-color: #47a3ad; color: white; text-decoration: none; border-radius: 5px; font-family: system-ui; font-size: 16px; font-weight: bolder;'>
                                     Go to UniSign
+                                </a>
+                                 <a href="${Link}" style='display: inline-block; padding: 10px 20px; background-color: #47a3ad; color: white; text-decoration: none; border-radius: 5px; font-family: system-ui; font-size: 16px; font-weight: bolder;'>
+                                change Password
                                 </a>
                                 
                                 <p style='font-family:system-ui;font-size:14px; margin-top: 15px;'>Please keep these details safe.</p>
