@@ -1,0 +1,31 @@
+# Dependency folders (Bohot badi files hoti hain, inhe nahi bhejna)
+node_modules/
+jspm_packages/
+apps/OpenSign/node_modules/
+apps/OpenSignServer/node_modules/
+
+# Environment files (SABSE IMPORTANT: Isme aapke passwords aur keys hain)
+*.env
+.env.prod
+.env.local
+.env.local_dev
+
+# User Uploaded Data (Jo PDFs aapne upload ki hain, wo server par alag rahengi)
+
+opensign-files/
+exports/
+logs/
+
+# Build folders (Ye Docker khud banayega)
+apps/OpenSign/dist/
+apps/OpenSign/.next/
+apps/OpenSign/build/
+apps/OpenSignServer/dist/
+
+# System files
+.DS_Store
+Thumbs.db
+*.zip
+
+#docker
+docker-compose.yml

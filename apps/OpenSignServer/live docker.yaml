@@ -1,0 +1,54 @@
+version: '3.8'
+services:
+server:
+build:
+context: .
+dockerfile: ./apps/OpenSignServer/Dockerhubfile
+container_name: OpenSignServer-container
+volumes:
+- ./apps/OpenSignServer:/usr/src/app
+- /usr/src/app/node_modules
+- ./apps/OpenSignServer/files:/usr/src/app/files
+# Ports wapas khol diye taaki System Nginx connect kar sake
+ports:
+- "8080:8080"
+depends_on:
+- mongo
+env_file: .env
+environment:
+- NODE_ENV=development
+networks:
+- app-network
+mongo:
+image: mongo:latest
+container_name: mongo-container
+volumes:
+- data-volume:/data/db
+ports:
+- "27017:27017"
+networks:
+- app-network
+client:
+build:
+context: .
+dockerfile: ./apps/OpenSign/Dockerhubfile
+container_name: OpenSign-container
+depends_on:
+- server
+volumes:
+- ./apps/OpenSign:/usr/src/app
+- /usr/src/app/node_modules
+- /usr/src/app/.next
+env_file: .env
+# Frontend ko 8081 par wapas map kiya
+ports:
+- "8081:3000"
+networks:
+- app-network
+entrypoint: ["npm", "run", "dev", "--", "--host"]
+command: []
+networks:
+app-network:
+driver: bridge
+volumes:
+data-volume:

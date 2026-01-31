@@ -1,0 +1,41 @@
+
+#-----------------------------------IP testing------------------
+
+# # FRONTEND CONFIG (Browser ke liye)
+# PUBLIC_URL=http://69.62.79.14:3000
+# GENERATE_SOURCEMAP=false
+# # Frontend browser se is IP par API hit karega
+# REACT_APP_SERVERURL=http://69.62.79.14:8080/app
+# REACT_APP_APPID=opensign
+
+# # BACKEND CONFIG
+# appName=SalmanSign_Live
+# MASTER_KEY=XnAadwKxxByMr
+# MONGODB_URI=mongodb://mongo-container:27017/OpenSignDB
+# PARSE_MOUNT=/app
+# # Backend server khud ko isi IP par pehchanega
+# SERVER_URL=http://69.62.79.14:8080/app
+
+# # STORAGE
+# USE_LOCAL=true
+
+# # EMAIL SETTINGS (Gmail Setup)
+# SMTP_ENABLE=true
+# SMTP_HOST=smtp.gmail.com
+# SMTP_PORT=465
+# SMTP_USER_EMAIL=salmanshaikh13749@gmail.com
+# SMTP_USERNAME=salmanshaikh13749@gmail.com
+# SMTP_PASS='jpbf ceko iwdp qoon'
+
+# # DUMMY MAILGUN
+# MAILGUN_API_KEY=none
+# MAILGUN_DOMAIN=none
+# MAILGUN_SENDER=none
+
+# # DIGITAL SIGNATURE (Wahi lamba code jo local mein tha)
+# PFX_BASE64='MIIKCQIBAzCCC...'
+# PASS_PHRASE=opensign
+# APP_ID=opensign
+
+# # System Mode
+# NODE_ENV=production
