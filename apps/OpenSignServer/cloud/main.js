@@ -240,3 +240,30 @@ let HomePgae = 'https://unisign.othersys.com/'; // Your app homepage link
 // ... (Baaki ke Parse.Cloud.define calls) ...
 
 // ... (Baaki ke Parse.Cloud.define calls) ...
+
+
+// --- EMAIL EXISTENCE CHECK FUNCTION ---
+Parse.Cloud.define("checkEmailExists", async (request) => {
+  const email = request.params.email;
+  
+  if (!email) {
+    throw new Error("Email is required.");
+  }
+
+  const query = new Parse.Query(Parse.User);
+  
+  // Dhyan rahe: Agar aapke DB me email 'username' column me hai toh yahan "username" likhein
+  // Agar 'email' column me hai toh "email" likhein. Usually "email" sahi hota hai.
+  query.equalTo("email", email); 
+  
+  // { useMasterKey: true } zaroori hai kyunki jo banda password reset kar raha hai
+  // wo abhi logged in nahi hai, toh bina MasterKey ke permission error aayega.
+  const user = await query.first({ useMasterKey: true });
+  console.log(user,"userlist")
+  
+  if (user) {
+    return true; // Email mil gaya
+  } else {
+    return false; // Email nahi mila
+  }
+});

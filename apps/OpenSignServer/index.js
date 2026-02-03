@@ -44,8 +44,12 @@ const RESET_PASSWORD_HTML = `
         .btn { display: block; width: 100%; padding: 12px; background-color: #47a3ad; color: white; border: none; border-radius: 5px; font-size: 16px; font-weight: bold; cursor: pointer; text-align: center; text-decoration: none; }
         .btn:hover { background-color: #3b8d96; }
         .btn:disabled { background-color: #ccc; cursor: not-allowed; }
-        #message { margin-top: 15px; text-align: center; font-size: 14px; }
-        .error { color: red; }
+        
+        /* Message Styling */
+        #message { margin-top: 15px; text-align: center; font-size: 14px; min-height: 20px; }
+        
+        /* Error class jo red color dega */
+        .error { color: red; font-weight: bold; } 
         .success { color: green; }
     </style>
 </head>
@@ -62,7 +66,8 @@ const RESET_PASSWORD_HTML = `
 
                 <form id="resetForm">
                     <label class="label">New Password</label>
-                    <input type="password" id="new_password" class="input-field" required placeholder="Enter new password" />
+                    <!-- Maine yahan se 'minlength' hata diya taaki Custom Red Error dikhe -->
+                    <input type="password" id="new_password" class="input-field" required placeholder="Enter new password (min 8 chars)" />
 
                     <label class="label">Confirm Password</label>
                     <input type="password" id="confirm_password" class="input-field" required placeholder="Confirm new password" />
@@ -87,11 +92,23 @@ const RESET_PASSWORD_HTML = `
 
         document.getElementById('resetForm').addEventListener('submit', async function(e) {
             e.preventDefault();
+            
             const password = document.getElementById('new_password').value;
             const confirm = document.getElementById('confirm_password').value;
             const messageDiv = document.getElementById('message');
             const btn = document.querySelector('.btn');
 
+            // Pehle purana message clear karein
+            messageDiv.innerHTML = '';
+
+            // --- VALIDATION 1: Check Length ---
+            // Ab ye code chalega aur Red Error dega
+            if (password.length < 8) {
+                messageDiv.innerHTML = '<span class="error">Password must be at least 8 characters long!</span>';
+                return;
+            }
+
+            // --- VALIDATION 2: Check Match ---
             if (password !== confirm) {
                 messageDiv.innerHTML = '<span class="error">Passwords do not match!</span>';
                 return;
@@ -101,20 +118,8 @@ const RESET_PASSWORD_HTML = `
             btn.innerText = 'Updating...';
 
             try {
-                // Determine API URL based on current location
-                // We are now at /app/password_reset_page, so we just go up to /app/apps/ID/...
-                
-                // Assuming current URL is https://site.com/app/password_reset_page...
-                // Origin: https://site.com
-                // Path: /app
-                
-                // Construct API path dynamically to be safe
                 const origin = window.location.origin;
-                // Parse Mount is usually the first part of pathname
-                const pathParts = window.location.pathname.split('/'); 
-                // Just in case mount path changes, we try to use the one from URL
-                const mountPath = '/app'; // Defaulting to /app as per standard Parse setup
-                
+                const mountPath = '/app'; 
                 const apiUrl = origin + mountPath + '/apps/' + id + '/request_password_reset';
 
                 const response = await fetch(apiUrl, {

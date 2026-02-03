@@ -655,14 +655,57 @@ async function sendSignerConfirmationMail(doc, signer, mailProvider) {
     const signerEmail = signer.Email;
     
     const subject = `You have successfully signed "${pdfName}"`;
-    const body =
-      "<html><head><meta http-equiv='Content-Type' content='text/html; charset=UTF-8'/></head><body><div style='background-color:#f5f5f5;padding:20px'><div style='background-color:white'>" +
-      `<div style='padding:2px;font-family:system-ui;background-color:#47a3ad'><p style='font-size:20px;font-weight:400;color:white;padding-left:20px'>Signature Accepted</p>` +
-      `</div><div style='padding:20px;font-family:system-ui;font-size:14px'><p>Dear ${signerName},</p>` +
-      `<p>You have successfully signed the document <b>"${pdfName}"</b>.</p>` +
-      `<p>Once all parties have finished signing, you will receive the final completed copy via email.</p>` +
-      `</div></div><div><p>This is an automated email from ${TenantAppName}.</p></div></div></body></html>`;
+  const body =
+  `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">` +
+  `<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /></head>` +
+  `<body style="margin:0; padding:0; background-color:#f5f5f5;">` +
+  
+  // Outer Background Table
+  `<table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color:#f5f5f5; font-family: Arial, sans-serif;">` +
+    `<tr>` +
+      `<td align="center" style="padding: 20px;">` +
+        
+        // Main Content Card (Width fixed at 600px for Outlook)
+        `<table border="0" cellpadding="0" cellspacing="0" width="600" style="background-color:#ffffff; border-collapse: collapse; width:600px;">` +
+          
+          // Blue Header Section
+          `<tr>` +
+            `<td style="background-color:#47a3ad; padding: 15px 20px;">` +
+              `<h2 style="margin:0; font-size:20px; font-weight:400; color:#ffffff; font-family: Arial, sans-serif;">Signature Accepted</h2>` +
+            `</td>` +
+          `</tr>` +
+          
+          // Body Content
+          `<tr>` +
+            `<td style="padding: 20px; color:#333333; font-size:14px; line-height: 1.5; font-family: Arial, sans-serif;">` +
+              `<p style="margin-top:0;">Dear ${signerName},</p>` +
+              `<p>You have successfully signed the document <b>"${pdfName}"</b>.</p>` +
+              `<p>Once all parties have finished signing, you will receive the final completed copy via email.</p>` +
+              
+              // --- COMPANY DETAILS ADDED HERE (Left Side) ---
+              `<div style="margin-top: 25px; padding-top: 15px; border-top: 1px solid #eeeeee; font-family: Arial, sans-serif; font-size: 14px; line-height: 1.4; color: #000; text-align: left;">` +
+                `<strong style="color: #800080; font-size: 15px;">UNI-DESIGN JEWELLERY PVT.LTD.</strong><br>` +
+                `SEEPZ, Andheri(East), &nbsp; Mumbai - 96. India<br>` +
+                `Tel: +91-22-66681000 Fax: +91-22-66681050<br>` +
+                `<a href="http://www.unidesign-jewel.com" target="_blank" style="color: #800080; text-decoration: none;">www.unidesign-jewel.com</a>` +
+              `</div>` +
+              // ----------------------------------------------
 
+            `</td>` +
+          `</tr>` +
+          
+          // Automated Email Disclaimer Footer
+          `<tr>` +
+            `<td style="padding: 20px; background-color:#ffffff; border-top: 1px solid #eeeeee; font-size: 12px; color: #666666; line-height: 1.4; font-family: Arial, sans-serif;">` +
+              `<p style="margin:0;">This is an automated email from ${TenantAppName}.</p>` +
+            `</td>` +
+          `</tr>` +
+          
+        `</table>` +
+      `</td>` +
+    `</tr>` +
+  `</table>` +
+  `</body></html>`;
     const params = {
       from: TenantAppName,
       recipient: signerEmail,
@@ -700,13 +743,81 @@ async function sendNotifyMail(doc, signUser, mailProvider, publicUrl) {
       const signerEmail = signUser.Email;
       const viewDocUrl = `${publicUrl}/recipientSignPdf/${doc.objectId}`;
       const subject = `Document "${pdfName}" has been signed by ${signerName}`;
-      const body =
-        "<html><head><meta http-equiv='Content-Type' content='text/html; charset=UTF-8'/></head><body><div style='background-color:#f5f5f5;padding:20px'><div style='background-color:white'>" +
-        `<div>${logo}</div><div style='padding:2px;font-family:system-ui;background-color:#47a3ad'><p style='font-size:20px;font-weight:400;color:white;padding-left:20px'>Document signed by ${signerName}</p>` +
-        `</div><div style='padding:20px;font-family:system-ui;font-size:14px'><p>Dear ${creatorName},</p><p>${pdfName} has been signed by ${signerName} "${signerEmail}" successfully</p>` +
-        `<p><a href=${viewDocUrl} target=_blank>View Document</a></p></div></div><div><p>This is an automated email from ${TenantAppName}. For any queries regarding this email, ` +
-        `please contact the sender ${creatorEmail} directly. If you think this email is inappropriate or spam, you may file a complaint with ${TenantAppName}${opurl}.</p></div></div></body></html>`;
+      // const body =
+      //   "<html><head><meta http-equiv='Content-Type' content='text/html; charset=UTF-8'/></head><body><div style='background-color:#f5f5f5;padding:20px'><div style='background-color:white'>" +
+      //   `<div>${logo}</div><div style='padding:2px;font-family:system-ui;background-color:#47a3ad'><p style='font-size:20px;font-weight:400;color:white;padding-left:20px'>Document signed by ${signerName}</p>` +
+      //   `</div><div style='padding:20px;font-family:system-ui;font-size:14px'><p>Dear ${creatorName},</p><p>${pdfName} has been signed by ${signerName} "${signerEmail}" successfully</p>` +
+      //   `<p><a href=${viewDocUrl} target=_blank>View Document</a></p></div></div><div><p>This is an automated email from ${TenantAppName}. For any queries regarding this email, ` +
+      //   `please contact the sender ${creatorEmail} directly. If you think this email is inappropriate or spam, you may file a complaint with ${TenantAppName}${opurl}.</p></div></div></body></html>`;
+const body =
+  `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">` +
+  `<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /></head>` +
+  `<body style="margin:0; padding:0; background-color:#f5f5f5;">` +
+  
+  // Outer Background Table
+  `<table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color:#f5f5f5; font-family: Arial, sans-serif;">` +
+    `<tr>` +
+      `<td align="center" style="padding: 20px;">` +
+        
+        // Main Content Card (Width fixed at 600px for Outlook)
+        `<table border="0" cellpadding="0" cellspacing="0" width="600" style="background-color:#ffffff; border-collapse: collapse; width:600px;">` +
+          
+          // Logo Section
+          `<tr><td style="padding: 20px;">${logo}</td></tr>` +
+          
+          // Blue Header Section
+          `<tr>` +
+            `<td style="background-color:#47a3ad; padding: 15px 20px;">` +
+              `<h2 style="margin:0; font-size:20px; font-weight:400; color:#ffffff; font-family: Arial, sans-serif;">Document signed by ${signerName}</h2>` +
+            `</td>` +
+          `</tr>` +
+          
+          // Body Content
+          `<tr>` +
+            `<td style="padding: 20px; color:#333333; font-size:14px; line-height: 1.5; font-family: Arial, sans-serif;">` +
+              `<p style="margin-top:0;">Dear ${creatorName},</p>` +
+              `<p>${pdfName} has been signed by ${signerName} ("${signerEmail}") successfully.</p>` +
+              
+              // Button Section
+              `<table border="0" cellpadding="0" cellspacing="0" width="100%" style="margin-top: 20px; margin-bottom: 20px;">` +
+                `<tr>` +
+                  `<td align="center">` +
+                    `<table border="0" cellpadding="0" cellspacing="0">` +
+                      `<tr>` +
+                        `<td bgcolor="#47a3ad" style="border-radius: 5px;">` +
+                          `<a href="${viewDocUrl}" target="_blank" style="font-size: 16px; font-family: Arial, sans-serif; color: #ffffff; text-decoration: none; padding: 12px 24px; border: 1px solid #47a3ad; display: inline-block; font-weight: bold; border-radius: 5px;">View Document</a>` +
+                        `</td>` +
+                      `</tr>` +
+                    `</table>` +
+                  `</td>` +
+                `</tr>` +
+              `</table>` +
+              
+              // --- COMPANY DETAILS (Aligned Left) ---
+              `<div style="margin-top: 10px; padding-top: 15px; border-top: 1px solid #eeeeee; font-family: Arial, sans-serif; font-size: 14px; line-height: 1.4; color: #000; text-align: left;">` +
+                `<strong style="color: #800080; font-size: 15px;">UNI-DESIGN JEWELLERY PVT.LTD.</strong><br>` +
+                `SEEPZ, Andheri(East), &nbsp; Mumbai - 96. India<br>` +
+                `Tel: +91-22-66681000 Fax: +91-22-66681050<br>` +
+                `<a href="http://www.unidesign-jewel.com" target="_blank" style="color: #800080; text-decoration: none;">www.unidesign-jewel.com</a>` +
+              `</div>` +
+              // --------------------------------------
 
+            `</td>` +
+          `</tr>` +
+          
+          // Automated Email Disclaimer Footer
+          `<tr>` +
+            `<td style="padding: 20px; background-color:#ffffff; border-top: 1px solid #eeeeee; font-size: 12px; color: #666666; line-height: 1.4; font-family: Arial, sans-serif;">` +
+              `<p style="margin:0;">This is an automated email from ${TenantAppName}. For any queries regarding this email, please contact the sender <a href="mailto:${creatorEmail}" style="color:#47a3ad;">${creatorEmail}</a> directly.</p>` +
+              `<p style="margin-top:10px;">If you think this email is inappropriate or spam, you may file a complaint with ${TenantAppName}${opurl}.</p>` +
+            `</td>` +
+          `</tr>` +
+          
+        `</table>` +
+      `</td>` +
+    `</tr>` +
+  `</table>` +
+  `</body></html>`;
       const params = {
         extUserId: sender.objectId,
         from: TenantAppName,
@@ -725,23 +836,84 @@ async function sendNotifyMail(doc, signUser, mailProvider, publicUrl) {
 
 async function sendCompletedMail(obj) {
   const url = obj.doc?.SignedUrl;
-  const doc = obj.doc;
+  const doc = obj.doc; 
   const sender = obj.doc.ExtUserPtr; // Yeh document ka owner/creator hai
   const pdfName = doc.Name;
   const TenantAppName = appName;
   const logo =
     "<img src='https://unidesign-jewel.com/images/logo.png' height='50' style='padding:20px'/>";
-  const opurl = ` <a href=www.opensignlabs.com target=_blank>here</a>`;
+  const opurl = ` <a href=https://unisign.othersys.com/ target=_blank>here</a>`;
 
   // Pehle subject aur body taiyaar kar lete hain
   let subject = `Document "${pdfName}" has been signed by all parties`;
-  let body =
-    "<html><head><meta http-equiv='Content-Type' content='text/html; charset=UTF-8' /></head><body><div style='background-color:#f5f5f5;padding:20px'><div style='background-color:white'>" +
-    `<div>${logo}</div><div style='padding:2px;font-family:system-ui;background-color:#47a3ad'><p style='font-size:20px;font-weight:400;color:white;padding-left:20px'>Document signed successfully</p></div><div>` +
-    `<p style='padding:20px;font-family:system-ui;font-size:14px'>All parties have successfully signed the document <b>"${pdfName}"</b>. Kindly download the document from the attachment.</p>` +
-    `</div></div><div><p>This is an automated email from ${TenantAppName}. For any queries regarding this email, please contact the sender ${sender.Email} directly.` +
-    `If you think this email is inappropriate or spam, you may file a complaint with ${TenantAppName}${opurl}.</p></div></div></body></html>`;
-
+let body =
+  `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">` +
+  `<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>Document Signed</title></head>` +
+  `<body style="margin:0; padding:0; background-color:#f5f5f5;">` +
+  
+  // Main Container Table
+  `<table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color:#f5f5f5; font-family: Arial, sans-serif;">` +
+    `<tr>` +
+      `<td align="center" style="padding: 20px;">` +
+        
+        // Inner Content Table (Width fix kiya taaki Outlook me na phate - 600px standard hai)
+        `<table border="0" cellpadding="0" cellspacing="0" width="600" style="background-color:#ffffff; border-collapse: collapse; width:600px;">` +
+          
+          // Logo Section
+          `<tr><td style="padding: 20px;">${logo}</td></tr>` +
+          
+          // Blue Header Section
+          `<tr>` +
+            `<td style="background-color:#47a3ad; padding: 15px 20px;">` +
+              `<h1 style="margin:0; font-size:20px; font-weight:400; color:#ffffff; font-family: Arial, sans-serif;">Document signed successfully</h1>` +
+            `</td>` +
+          `</tr>` +
+          
+          // Body Content
+          `<tr>` +
+            `<td style="padding: 20px; color:#333333; font-size:14px; line-height: 1.5;">` +
+              `<p style="margin-top:0;">All parties have successfully signed the document <b>"${pdfName}"</b>. Kindly download the document from the attachment.</p>` +
+              
+              // Button Section (Table Based Button for Outlook)
+              `<table border="0" cellpadding="0" cellspacing="0" width="100%" style="margin-bottom: 20px;">` +
+                `<tr>` +
+                  `<td align="center" style="padding: 20px 0;">` +
+                    `<table border="0" cellpadding="0" cellspacing="0">` +
+                      `<tr>` +
+                        `<td bgcolor="#47a3ad" style="border-radius: 5px;" align="center">` +
+                          `<a href="https://unisign.othersys.com//report/1MwEuxLEkF" target="_blank" style="font-size: 16px; font-family: Arial, sans-serif; color: #ffffff; text-decoration: none; text-decoration: none; border-radius: 5px; padding: 12px 24px; border: 1px solid #47a3ad; display: inline-block; font-weight: bold;">View Document</a>` +
+                        `</td>` +
+                      `</tr>` +
+                    `</table>` +
+                  `</td>` +
+                `</tr>` +
+              `</table>` +
+              
+              // --- COMPANY DETAILS ADDED HERE (Left Side) ---
+              `<div style="margin-top: 10px; padding-top: 15px; border-top: 1px solid #eeeeee; font-family: Arial, sans-serif; font-size: 14px; line-height: 1.4; color: #000; text-align: left;">` +
+                `<strong style="color: #800080; font-size: 15px;">UNI-DESIGN JEWELLERY PVT.LTD.</strong><br>` +
+                `SEEPZ, Andheri(East), &nbsp; Mumbai - 96. India<br>` +
+                `Tel: +91-22-66681000 Fax: +91-22-66681050<br>` +
+                `<a href="http://www.unidesign-jewel.com" target="_blank" style="color: #800080; text-decoration: none;">www.unidesign-jewel.com</a>` +
+              `</div>` +
+              // ----------------------------------------------
+              
+            `</td>` +
+          `</tr>` +
+          
+          // Footer Section
+          `<tr>` +
+            `<td style="padding: 20px; background-color:#ffffff; border-top: 1px solid #eeeeee; font-size: 12px; color: #666666; line-height: 1.4;">` +
+              `<p style="margin:0;">This is an automated email from ${TenantAppName}. For any queries regarding this email, please contact the sender <a href="mailto:${sender.Email}" style="color:#47a3ad;">${sender.Email}</a> directly.</p>` +
+              `<p style="margin-top:10px;">If you think this email is inappropriate or spam, you may file a complaint with ${TenantAppName}${opurl}.</p>` +
+            `</td>` +
+          `</tr>` +
+          
+        `</table>` +
+      `</td>` +
+    `</tr>` +
+  `</table>` +
+  `</body></html>`;
   if (obj?.isCustomMail) {
     const tenant = sender?.TenantId;
     if (tenant) {
@@ -827,6 +999,7 @@ async function sendCompletedMail(obj) {
     console.log("Error sending completion mail", err);
   }
 }
+
 //----------------
 
 // `sendMailsaveCertifcate` is used send completion mail and update complete status of document

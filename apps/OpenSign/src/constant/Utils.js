@@ -3667,32 +3667,88 @@ export const mailTemplate = (param) => {
   const appName = "UniSign";
   const logo = `<div style='padding:10px'><img src='https://unidesign-jewel.com/images/logo.png' height='50' /></div>`;
 
-  const opurl = ` <a href='https://www.opensignlabs.com' target=_blank>here</a>.</p></div></div></body></html>`;
+  const opurl = ` <a href='#' target=_blank>here</a>.</p></div></div></body></html>`;
   const subject = `${param.senderName} has requested you to sign "${param.title}"`;
-  const body =
-    "<html><head><meta http-equiv='Content-Type' content='text/html;charset=UTF-8' /></head><body><div style='background-color:#f5f5f5;padding:20px'><div style='background:white;padding-bottom:20px'>" +
-    logo +
-    `<div style='padding:2px;font-family:system-ui;background-color:${themeColor}'><p style='font-size:20px;font-weight:400;color:white;padding-left:20px'>Digital Signature Request</p></div><div><p style='padding:20px;font-size:14px;margin-bottom:10px'>` +
-    param.senderName +
-    " has requested you to review and sign <strong>" +
-    param.title +
-    "</strong>.</p><div style='padding: 5px 0px 5px 25px;display:flex;flex-direction:row;justify-content:space-around'><table><tr><td style='font-weight:bold;font-family:sans-serif;font-size:15px'>Sender</td><td></td><td style='color:#626363;font-weight:bold'>" +
-    param.senderMail +
-    "</td></tr><tr><td style='font-weight:bold;font-family:sans-serif;font-size:15px'>Organization</td><td></td><td style='color:#626363;font-weight:bold'> " +
-    param.organization +
-    "</td></tr><tr><td style='font-weight:bold;font-family:sans-serif;font-size:15px'>Expires on</td><td></td><td style='color:#626363;font-weight:bold'>" +
-    param.localExpireDate +
-    "</td></tr><tr><td style='font-weight:bold;font-family:sans-serif;font-size:15px'>Note</td><td></td><td style='color:#626363;font-weight:bold'>" +
-    param.note +
-    "</td></tr><tr><td></td><td></td></tr></table></div> <div style='margin-left:70px'><a target=_blank href=" +
-    param.signingUrl +
-    "><button style='padding:12px;background-color:#d46b0f;color:white;border:0px;font-weight:bold;margin-top:30px'>Sign here</button></a></div><div style='display:flex;justify-content:center;margin-top:10px'></div></div></div><div><p> This is an automated email from " +
-    appName +
-    ". For any queries regarding this email, please contact the sender " +
-    param.senderMail +
-    " directly. If you think this email is inappropriate or spam, you may file a complaint with " +
-    appName +
-    opurl;
+ const body =
+  `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">` +
+  `<html xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /></head>` +
+  `<body style="margin:0; padding:0; background-color:#f5f5f5;">` +
+  
+  // Outer Table
+  `<table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color:#f5f5f5; font-family: Arial, sans-serif;">` +
+    `<tr>` +
+      `<td align="center" style="padding: 20px;">` +
+        
+        // Inner White Card
+        `<table border="0" cellpadding="0" cellspacing="0" width="600" style="background-color:#ffffff; border-collapse: collapse; width:600px;">` +
+          
+          // Logo
+          `<tr><td style="padding: 20px;">${logo}</td></tr>` +
+          
+          // Header
+          `<tr>` +
+            `<td style="background-color:${themeColor}; padding: 15px 20px;">` +
+              `<h2 style="margin:0; font-size:20px; font-weight:400; color:#ffffff; font-family: Arial, sans-serif;">Digital Signature Request</h2>` +
+            `</td>` +
+          `</tr>` +
+          
+          // Body Content
+          `<tr>` +
+            `<td style="padding: 20px; color:#333333; font-size:14px; line-height: 1.5; font-family: Arial, sans-serif;">` +
+              `<p style="margin-top:0; margin-bottom:20px;">` +
+                param.senderName +
+                " has requested you to review and sign <strong>" +
+                param.title +
+                "</strong>.</p>" +
+                
+              // Details Table
+              `<table border="0" cellpadding="5" cellspacing="0" width="100%">` +
+                `<tr><td width="30%" style="font-weight:bold;">Sender</td><td style="color:#626363;">` + param.senderMail + `</td></tr>` +
+                `<tr><td style="font-weight:bold;">Organization</td><td style="color:#626363;">` + param.organization + `</td></tr>` +
+                `<tr><td style="font-weight:bold;">Expires on</td><td style="color:#626363;">` + param.localExpireDate + `</td></tr>` +
+                `<tr><td style="font-weight:bold;">Note</td><td style="color:#626363;">` + param.note + `</td></tr>` +
+              `</table>` +
+              
+              // --- BULLETPROOF BUTTON (VML FIX) START ---
+              // Ye code Outlook me VML shape banata hai aur Gmail me CSS button
+              `<div style="margin-top: 25px; margin-bottom: 25px;">` +
+                `<!--[if mso]>` +
+                `<v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="${param.signingUrl}" style="height:40px;v-text-anchor:middle;width:150px;" arcsize="10%" stroke="f" fillcolor="#d46b0f">` +
+                  `<w:anchorlock/>` +
+                  `<center>` +
+                `<![endif]-->` +
+                    `<a href="${param.signingUrl}" style="background-color:#d46b0f;border-radius:4px;color:#ffffff;display:inline-block;font-family:Arial,sans-serif;font-size:16px;font-weight:bold;line-height:40px;text-align:center;text-decoration:none;width:150px;-webkit-text-size-adjust:none;">Sign here</a>` +
+                `<!--[if mso]>` +
+                  `</center>` +
+                `</v:roundrect>` +
+                `<![endif]-->` +
+              `</div>` +
+              // --- BULLETPROOF BUTTON END ---
+
+              // Footer Company Data
+              `<div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #eeeeee; font-family: Arial, sans-serif; font-size: 14px; line-height: 1.4; color: #000;">` +
+                `<strong style="color: #800080; font-size: 15px;">UNI-DESIGN JEWELLERY PVT.LTD.</strong><br>` +
+                `SEEPZ, Andheri(East), &nbsp; Mumbai - 96. India<br>` +
+                `Tel: +91-22-66681000 Fax: +91-22-66681050<br>` +
+                `<a href="http://www.unidesign-jewel.com" target="_blank" style="color: #800080; text-decoration: none;">www.unidesign-jewel.com</a>` +
+              `</div>` +
+
+            `</td>` +
+          `</tr>` +
+          
+          // Disclaimer Footer
+          `<tr>` +
+            `<td style="padding: 20px; background-color:#f9f9f9; border-top: 1px solid #eeeeee; font-size: 12px; color: #666666; font-family: Arial, sans-serif;">` +
+              `<p style="margin:0;">This is an automated email from ` + appName + `. For any queries regarding this email, please contact the sender <a href="mailto:` + param.senderMail + `" style="color:#d46b0f;">` + param.senderMail + `</a> directly.</p>` +
+              `<p style="margin-top:10px;">If you think this email is inappropriate or spam, you may file a complaint with ` + appName + opurl + `.</p>` +
+            `</td>` +
+          `</tr>` +
+          
+        `</table>` +
+      `</td>` +
+    `</tr>` +
+  `</table>` +
+  `</body></html>`;
 
   return { subject, body };
 };
